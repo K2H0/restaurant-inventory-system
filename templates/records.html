@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container">
+
+    <div class="header">
+        <h1>Restaurant Records</h1>
+
+        <p>
+            View all captured restaurant inventory data
+        </p>
+    </div>
+
+
+    <div class="card">
+
+        <form method="GET" action="/records">
+
+            <div class="form-group">
+
+                <label>Search Ingredient</label>
+
+                <input
+                    type="text"
+                    name="search"
+                    placeholder="Search ingredient name..."
+                >
+
+            </div>
+
+            <div class="button-container">
+                <button type="submit">
+                    Search
+                </button>
+            </div>
+
+        </form>
+
+    </div>
+
+
+    <div class="card">
+
+        <table>
+
+            <tr>
+                <th>Ingredient</th>
+                <th>Category</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Purchase Date</th>
+                <th>Supplier</th>
+                <th>Used</th>
+                <th>Expiry Date</th>
+                <th>Actions</th>
+            </tr>
+
+            {% for item in ingredients %}
+
+            <tr>
+
+                <td>{{ item.ingredient_name }}</td>
+                <td>{{ item.category }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>R{{ item.price }}</td>
+                <td>{{ item.purchase_date }}</td>
+                <td>{{ item.supplier }}</td>
+                <td>{{ item.used }}</td>
+                <td>{{ item.expiry_date }}</td>
+
+                <td>
+
+                    <a href="/edit/{{ item.id }}">
+                        Edit
+                    </a>
+
+                    |
+
+                    {% if current_user.role == 'admin' %}
+
+                    <a href="/delete/{{ item.id }}">
+                        Delete
+                    </a>
+
+                    {% endif %}
+
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+        </table>
+
+        <div class="links">
+
+            <a href="/">
+                Back Home
+            </a>
+
+            <a href="/export">
+                Export CSV
+            </a>
+
+            <a href="/logout">
+                Logout
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>
+
+{% endblock %}

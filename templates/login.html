@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>Login</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+        <h1>Restaurant Inventory Login</h1>
+    </div>
+
+    <div class="card">
+
+        {% with messages = get_flashed_messages() %}
+
+            {% if messages %}
+
+                {% for message in messages %}
+
+                    <div class="flash-message">
+
+                        {{ message }}
+
+                    </div>
+
+                {% endfor %}
+
+            {% endif %}
+
+        {% endwith %}
+
+        <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" name="username" required>
+            </div>
+
+            <br>
+
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" name="password" required>
+            </div>
+
+            <div class="button-container">
+                <button type="submit">
+                    Login
+                </button>
+            </div>
+
+        </form>
+
+        <br>
+
+        <div class="auth-link">
+
+            Don't have a restaurant account?
+
+            <a href="/signup">
+
+                Register here
+
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

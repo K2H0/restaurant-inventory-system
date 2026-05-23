@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Restaurant Inventory System</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+
+</head>
+
+<body>
+
+<div class="layout">
+
+    <div class="sidebar">
+
+        <h2>RIS</h2>
+
+        <a href="/">Dashboard</a>
+
+        <a href="/records">Records</a>
+
+        <a href="/create-user">Create User</a>
+
+        <a href="/export">Export CSV</a>
+
+        <a href="/logout">Logout</a>
+
+    </div>
+
+    <div class="main-content">
+
+        {% block content %}
+
+        {% endblock %}
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

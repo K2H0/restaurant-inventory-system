@@ -1,0 +1,11 @@
+pandas~=3.0.3
+Flask
+Flask-SQLAlchemy
+Flask-Login
+Flask-WTF
+Flask-Limiter
+python-dotenv
+pandas
+psycopg2-binary
+Werkzeug
+gunicorn

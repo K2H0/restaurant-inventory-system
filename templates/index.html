@@ -1,0 +1,358 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="hero-section">
+
+    <h1>Restaurant Inventory System</h1>
+
+    <p>
+        Capture and manage restaurant ingredient data efficiently
+    </p>
+
+</div>
+
+{% if low_stock_items %}
+
+<div class="alert-box">
+
+    <h3>⚠ Low Stock Alerts</h3>
+
+    {% for item in low_stock_items %}
+
+        <div class="alert-item">
+
+            {{ item.ingredient_name }}
+            is running low
+            ({{ item.quantity }} remaining)
+
+        </div>
+
+    {% endfor %}
+
+</div>
+
+{% endif %}
+
+
+{% if expiring_items %}
+
+<div class="expiry-warning">
+
+    <h3>⚠ Expiring Soon</h3>
+
+    {% for item in expiring_items %}
+
+        <div class="expiry-item">
+
+            {{ item.name }}
+            expires in
+            {{ item.days }}
+            day(s)
+
+        </div>
+
+    {% endfor %}
+
+</div>
+
+{% endif %}
+
+
+{% if expired_items %}
+
+<div class="expired-box">
+
+    <h3>❌ Expired Ingredients</h3>
+
+    {% for item in expired_items %}
+
+        <div class="expired-item">
+
+            {{ item.name }}
+            expired
+            {{ item.days }}
+            day(s) ago
+
+        </div>
+
+    {% endfor %}
+
+</div>
+
+{% endif %}
+
+<div class="container">
+
+    <div class="header">
+
+        <div class="dashboard-grid">
+
+    <div class="dashboard-card">
+        <h3>Total Records</h3>
+        <p>{{ total_items }}</p>
+    </div>
+
+    <div class="dashboard-card">
+        <h3>Total Inventory Cost</h3>
+        <p>R{{ total_cost }}</p>
+    </div>
+
+    <div class="dashboard-card">
+        <h3>Used Items</h3>
+        <p>{{ used_items }}</p>
+    </div>
+
+    <div class="dashboard-card">
+        <h3>Unused Items</h3>
+        <p>{{ unused_items }}</p>
+    </div>
+
+        </div>
+
+
+
+        <div class="charts-container">
+
+            <div class="chart-box">
+
+                <canvas id="usedChart"></canvas>
+
+            </div>
+
+            <div class="chart-box">
+
+                <canvas id="categoryChart"></canvas>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+    <div class="card">
+
+        <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="form-grid">
+
+                <div class="form-group">
+                    <label>Ingredient Name</label>
+
+                    <input
+                        type="text"
+                        name="ingredient_name"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label>Category</label>
+
+                    <input
+                        type="text"
+                        name="category"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label>Quantity</label>
+
+                    <input
+                        type="number"
+                        step="0.01"
+                        name="quantity"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label>Price</label>
+
+                    <input
+                        type="number"
+                        step="0.01"
+                        name="price"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label>Purchase Date</label>
+
+                    <input
+                        type="date"
+                        name="purchase_date"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label>Expiry Date</label>
+
+                    <input
+                        type="date"
+                        name="expiry_date"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label>Supplier</label>
+
+                    <input
+                        type="text"
+                        name="supplier"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label>Used?</label>
+
+                    <select name="used">
+                        <option>Yes</option>
+                        <option>No</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <div class="button-container">
+                <button type="submit">
+                    Save Record
+                </button>
+            </div>
+
+        </form>
+
+        <div class="links">
+
+            <a href="/create-user">
+                Create User
+            </a>
+
+            <a href="/records">
+                View Records
+            </a>
+
+            <a href="/export">
+                Export CSV
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div class="activity-box">
+
+    <h3>Recent Activity</h3>
+
+    {% for log in logs %}
+
+        <div class="activity-item">
+
+            {{ log.action }}
+
+            <br>
+
+            <small>
+                {{ (log.timestamp + timedelta(hours=2)).strftime('%Y-%m-%d %H:%M') }}
+            </small>
+
+        </div>
+
+    {% if current_user.role == 'admin' %}
+
+        <a
+            href="/delete-log/{{ log.id }}"
+            class="delete-log-btn"
+            onclick="return confirm('Are you sure you want to delete this activity?')"
+        >
+            Delete
+        </a>
+
+    {% endif %}
+
+    {% endfor %}
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+
+    // PIE CHART
+
+    const usedChart = new Chart(
+
+        document.getElementById('usedChart'),
+
+        {
+
+            type: 'pie',
+
+            data: {
+
+                labels: ['Used', 'Unused'],
+
+                datasets: [{
+
+                    data: [
+
+                        {{ used_items }},
+
+                        {{ unused_items }}
+
+                    ]
+
+                }]
+
+            }
+
+        }
+
+    );
+
+
+
+    // BAR CHART
+
+    const categoryChart = new Chart(
+
+        document.getElementById('categoryChart'),
+
+        {
+
+            type: 'bar',
+
+            data: {
+
+                labels: {{ categories | tojson }},
+
+                datasets: [{
+
+                    label: 'Category Spending',
+
+                    data: {{ category_totals | tojson }}
+
+                }]
+
+            }
+
+        }
+
+    );
+
+</script>
+
+        </div>
+</div>
+</body>
+</html>
+
+{% endblock %}
