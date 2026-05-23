@@ -4,3 +4,4 @@ venv/
 __pycache__/
 *.pyc
 restaurant_data.csv
+instance/

@@ -306,7 +306,7 @@ def create_user():
 
         username = request.form['username']
         password = request.form['password']
-        role = request.form['role']
+        role = request.form['role']git rm --cached instance/restaurant.db
 
         if not valid_password(password):
             flash(
