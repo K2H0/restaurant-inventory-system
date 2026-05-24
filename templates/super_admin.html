@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1>Platform Dashboard</h1>
+
+<div class="stats-grid">
+
+    <div class="card">
+        <h3>Total Restaurants</h3>
+        <p>{{ restaurants|length }}</p>
+    </div>
+
+</div>
+
+<h2>Restaurants</h2>
+
+<table class="records-table">
+
+    <tr>
+        <th>Name</th>
+        <th>Status</th>
+        <th>Action</th>
+    </tr>
+
+    {% for restaurant in restaurants %}
+
+    <tr>
+
+        <td>{{ restaurant.name }}</td>
+
+        <td>
+            {% if restaurant.is_active %}
+                Active
+            {% else %}
+                Suspended
+            {% endif %}
+        </td>
+
+        <td>
+
+            {% if restaurant.is_active %}
+
+                <a href="/suspend-restaurant/{{ restaurant.id }}">
+                    Suspend
+                </a>
+
+            {% else %}
+
+                <a href="/activate-restaurant/{{ restaurant.id }}">
+                    Activate
+                </a>
+
+            {% endif %}
+
+        </td>
+
+    </tr>
+
+    {% endfor %}
+
+</table>
+
+{% endblock %}

@@ -116,6 +116,14 @@ class User(UserMixin, db.Model):
         db.ForeignKey('restaurant.id')
     )
 
+    email = db.Column(
+        db.String(120),
+        unique=True,
+        nullable=True
+    )
+
+
+
 
 # INGREDIENT MODEL
 
@@ -145,6 +153,11 @@ class Restaurant(db.Model):
 
     location = db.Column(db.String(100))
 
+    is_active = db.Column(
+        db.Boolean,
+        default=True
+    )
+
 class ActivityLog(db.Model):
 
     id = db.Column(
@@ -165,6 +178,54 @@ class ActivityLog(db.Model):
         db.Integer,
         db.ForeignKey('restaurant.id')
     )
+
+@app.route('/super-admin')
+@login_required
+def super_admin():
+
+    if current_user.role != 'super_admin':
+        return 'Access Denied'
+
+    restaurants = Restaurant.query.all()
+
+    return render_template(
+        'super_admin.html',
+        restaurants=restaurants
+    )
+
+@app.route('/suspend-restaurant/<int:id>')
+@login_required
+def suspend_restaurant(id):
+
+    if current_user.role != 'super_admin':
+        return 'Access Denied'
+
+    restaurant = Restaurant.query.get_or_404(id)
+
+    restaurant.is_active = False
+
+    db.session.commit()
+
+    flash('Restaurant suspended')
+
+    return redirect('/super-admin')
+
+@app.route('/activate-restaurant/<int:id>')
+@login_required
+def activate_restaurant(id):
+
+    if current_user.role != 'super_admin':
+        return 'Access Denied'
+
+    restaurant = Restaurant.query.get_or_404(id)
+
+    restaurant.is_active = True
+
+    db.session.commit()
+
+    flash('Restaurant activated')
+
+    return redirect('/super-admin')
 
 @app.route('/delete-log/<int:id>')
 @login_required
@@ -211,6 +272,14 @@ def login():
         ).first()
 
         if user and check_password_hash(user.password, password):
+            restaurant = Restaurant.query.get(
+                user.restaurant_id
+            )
+
+            if restaurant and not restaurant.is_active:
+                flash('Restaurant account suspended')
+                return redirect('/login')
+
             login_user(user)
 
             return redirect('/')
@@ -620,8 +689,26 @@ def export():
 
 
 with app.app_context():
+
     db.create_all()
 
+    existing_super_admin = User.query.filter_by(
+        username='khumo'
+    ).first()
+
+    if not existing_super_admin:
+
+        super_admin = User(
+            username='khumo',
+            password=generate_password_hash('khumo123'),
+            role='super_admin',
+            email='khumomakhumisane@email.com'
+        )
+
+        db.session.add(super_admin)
+
+        db.session.commit()
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
 

@@ -5,8 +5,7 @@
 
     <meta charset="UTF-8">
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Restaurant Inventory System</title>
 
@@ -34,6 +33,10 @@
         <a href="/export">Export CSV</a>
 
         <a href="/logout">Logout</a>
+
+        {% if current_user.role == 'super_admin' %}
+            <a href="/super-admin">Platform Dashboard</a>
+        {% endif %}
 
     </div>
 
